@@ -4,14 +4,15 @@ require(shiny)
 require(jpeg)
 require(png)
 
-if (!file.exists("synset.txt")) {
-  download.file("http://data.dmlc.ml/mxnet/models/imagenet/inception-bn.tar.gz", destfile = "inception-bn.tar.gz")
-  untar("Inception.zip")
-}
+download.file("http://webdocs.cs.ualberta.ca/~bx3/data/Inception.zip", destfile = "Inception.zip")
+unzip("Inception.zip")
 
-model <<- mx.model.load("./Inception-BN", iteration = 126)
+dir <- getwd()
+# make sure "Inception_BN-XXX" and "synset.txt" file is on the right place
+# you may download the "Inception.zip" by hand, if so, comment out the 3 lines of code above
 
-synsets <<- readLines("synset.txt")
+model <<- mx.model.load(paste0(dir,"/Inception/Inception_BN"), iteration = 39)
+synsets <<- readLines(paste0(dir,"/Inception/synset.txt"))
 
 preproc.image <- function(im, mean.image) {
   # crop the image
@@ -48,7 +49,7 @@ shinyServer(function(input, output) {
     list(src = if (input$tabs == "Upload Image") {
       if (is.null(input$file1)) {
         if (input$goButton == 0 || is.null(ntext())) {
-          'cthd.jpg'
+          'cthd.jpg' # the path must be right, and you may use the absolute path (similarly hereinafter)
         } else {
           ntext()
         }
